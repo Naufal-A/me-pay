@@ -32,7 +32,36 @@ Di terminal baru, jalankan:
 npm run dev
 ```
 
-Buka `http://localhost:3000` untuk melihat aplikasi.
+---
+
+src/
+├── app/
+│ │ ├── layout.tsx <-- Navbar/Footer khusus pembeli
+│ ├── (customer)/ <-- Halaman untuk pembeli
+│ │ ├── layout.tsx <-- Navbar/Footer khusus pembeli
+│ │ └── menu/
+│ │ └── page.tsx <-- Nampilin list menu (fetch dari DB)
+│ │
+│ ├── (admin)/ <-- Halaman khusus admin
+│ │ ├── layout.tsx <-- Sidebar dasbor admin
+│ │ └── dashboard/
+│ │ ├── page.tsx <-- Ringkasan/Statistik
+│ │ └── manage-menu/
+│ │ └── page.tsx <-- Tabel CRUD menu (Tambah, Edit, Delete)
+│ │
+│ └── layout.tsx <-- Navbar/Footer khusus pembeli
+│  
+├── api/ <-- Kalau butuh Route Handlers
+├── components/  
+│ ├── ui/ <-- Tombol, Input, dll
+│ └── MenuCard.tsx <-- Komponen card menu yang dipakai berulang
+│
+└── lib/  
+ └── db.ts <-- Konfigurasi koneksi database
+
+---
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ---
 
@@ -40,13 +69,13 @@ Buka `http://localhost:3000` untuk melihat aplikasi.
 
 Repo ini sudah terintegrasi dengan Firebase project `me-pay-ab9a1`. Berikut konfigurasi yang ada:
 
-| Konfigurasi | Nilai |
-|---|---|
-| **Project ID** | `me-pay-ab9a1` |
-| **Region** | `asia-southeast2` |
-| **Auth Emulator Port** | `9099` |
-| **Firestore Emulator Port** | `8080` |
-| **Firestore UI** | Enabled (http://localhost:4000) |
+| Konfigurasi                 | Nilai                           |
+| --------------------------- | ------------------------------- |
+| **Project ID**              | `me-pay-ab9a1`                  |
+| **Region**                  | `asia-southeast2`               |
+| **Auth Emulator Port**      | `9099`                          |
+| **Firestore Emulator Port** | `8080`                          |
+| **Firestore UI**            | Enabled (http://localhost:4000) |
 
 ---
 
@@ -163,11 +192,11 @@ me-pay/
 
 ## File Firebase yang Penting
 
-| File | Deskripsi |
-|---|---|
-| `.firebaserc` | Konfigurasi project Firebase default |
-| `firebase.json` | Setup emulator, Firestore, dan Auth |
-| `firestore.rules` | Security rules Firestore |
+| File                     | Deskripsi                                    |
+| ------------------------ | -------------------------------------------- |
+| `.firebaserc`            | Konfigurasi project Firebase default         |
+| `firebase.json`          | Setup emulator, Firestore, dan Auth          |
+| `firestore.rules`        | Security rules Firestore                     |
 | `firestore.indexes.json` | Index configuration untuk query optimization |
 
 > ⚠️ **Penting**: `firestore.rules` saat ini membuka akses baca/tulis sementara sampai `2026-07-12`. Update dengan security rules yang lebih ketat sebelum production.
