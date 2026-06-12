@@ -17,7 +17,7 @@ export default function LoginPage() { // 1. Nama fungsi disesuaikan
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    setErrorMessage(""); // Reset error setiap kali tombol ditekan
+    setErrorMessage("");
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
