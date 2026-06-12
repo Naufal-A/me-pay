@@ -8,8 +8,8 @@ export default function Home() {
         </div>
         <div
           className="transition-all duration-100
-                       active:scale-95 flex hover:bg-gray-100 
-                       p-3 rounded-full "
+                      active:scale-95 flex hover:bg-gray-100 
+                      p-3 rounded-full "
         >
           <img
             className=""

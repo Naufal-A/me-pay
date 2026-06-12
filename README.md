@@ -14,6 +14,31 @@ pnpm dev
 bun dev
 ```
 
+---
+
+app/
+├── (customer)/ <-- Halaman untuk pembeli
+│ ├── layout.tsx <-- Navbar/Footer khusus pembeli
+│ └── menu/
+│ └── page.tsx <-- Nampilin list menu (fetch dari DB)
+│
+├── (admin)/ <-- Halaman khusus admin
+│ ├── layout.tsx <-- Sidebar dasbor admin
+│ └── dashboard/
+│ ├── page.tsx <-- Ringkasan/Statistik
+│ └── manage-menu/
+│ └── page.tsx <-- Tabel CRUD menu (Tambah, Edit, Delete)
+│
+├── api/ <-- Kalau butuh Route Handlers
+├── components/  
+│ ├── ui/ <-- Tombol, Input, dll
+│ └── MenuCard.tsx <-- Komponen card menu yang dipakai berulang
+│
+└── lib/  
+ └── db.ts <-- Konfigurasi koneksi database
+
+---
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
