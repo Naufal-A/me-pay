@@ -16,19 +16,23 @@ bun dev
 
 ---
 
-app/
-├── (customer)/ <-- Halaman untuk pembeli
-│ ├── layout.tsx <-- Navbar/Footer khusus pembeli
-│ └── menu/
-│ └── page.tsx <-- Nampilin list menu (fetch dari DB)
-│
-├── (admin)/ <-- Halaman khusus admin
-│ ├── layout.tsx <-- Sidebar dasbor admin
-│ └── dashboard/
-│ ├── page.tsx <-- Ringkasan/Statistik
-│ └── manage-menu/
-│ └── page.tsx <-- Tabel CRUD menu (Tambah, Edit, Delete)
-│
+src/
+├── app/
+│ │ ├── layout.tsx <-- Navbar/Footer khusus pembeli
+│ ├── (customer)/ <-- Halaman untuk pembeli
+│ │ ├── layout.tsx <-- Navbar/Footer khusus pembeli
+│ │ └── menu/
+│ │ └── page.tsx <-- Nampilin list menu (fetch dari DB)
+│ │
+│ ├── (admin)/ <-- Halaman khusus admin
+│ │ ├── layout.tsx <-- Sidebar dasbor admin
+│ │ └── dashboard/
+│ │ ├── page.tsx <-- Ringkasan/Statistik
+│ │ └── manage-menu/
+│ │ └── page.tsx <-- Tabel CRUD menu (Tambah, Edit, Delete)
+│ │
+│ └── layout.tsx <-- Navbar/Footer khusus pembeli
+│  
 ├── api/ <-- Kalau butuh Route Handlers
 ├── components/  
 │ ├── ui/ <-- Tombol, Input, dll
