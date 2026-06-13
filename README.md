@@ -4,6 +4,22 @@ Aplikasi e-commerce berbasis Next.js dengan integrasi Firebase untuk authenticat
 
 ## Quick Start
 
+cd work/univ/124/rpl/me-pay
+
+### Run Development Server
+
+Di terminal baru, jalankan:
+
+```bash
+npm run dev
+```
+
+kemudian jalankan:
+
+```bash
+npm run emulator
+```
+
 ### Instalasi Dependencies
 
 ```bash
@@ -15,21 +31,13 @@ npm install
 Pastikan Anda sudah login ke Firebase:
 
 ```bash
-npx firebase login
+firebase login
 ```
 
 Kemudian jalankan emulator Firebase:
 
 ```bash
-npx firebase emulators:start
-```
-
-### Run Development Server
-
-Di terminal baru, jalankan:
-
-```bash
-npm run dev
+firebase emulators:start
 ```
 
 ---

@@ -1,4 +1,5 @@
 import { MenuItem } from "../types/menu";
+import Image from "next/image";
 
 export default function MenuCard({ menu }: { menu: MenuItem }) {
   return (
@@ -18,10 +19,12 @@ export default function MenuCard({ menu }: { menu: MenuItem }) {
 
       {/* Bagian Gambar */}
       {/* shrink-0 agar gambar tidak gepeng, w-28 h-28 memberi ukuran kotak yang konsisten */}
-      <div className="shrink-0 mr-4 sm:mr-5 w-28 h-28 relative">
-        <img
+      <div className=" items-center shrink-0 mr-4 sm:mr-5 w-28 h-28 relative">
+        <Image
           src={menu.image}
           alt={menu.name}
+          width={50}
+          height={50}
           className="object-cover w-full h-full rounded-2xl"
         />
       </div>
@@ -33,7 +36,7 @@ export default function MenuCard({ menu }: { menu: MenuItem }) {
           <h3 className="text-lg font-semibold text-gray-800 line-clamp-1 pr-14">
             {menu.name}
           </h3>
-          <p className="text-gray-500 text-sm mt-1 mb-2 line-clamp-2">
+          <p className="text-gray-500 text-sm  line-clamp-2">
             {menu.description}
           </p>
         </div>
@@ -46,7 +49,7 @@ export default function MenuCard({ menu }: { menu: MenuItem }) {
           {/* Tombol Tambah (+) */}
           <button
             disabled={menu.isSoldOut}
-            className={`rounded-2xl px-4 py-1.5 font-bold transition-colors ${
+            className={`rounded-full px-4 py-1.5 font-bold transition-colors ${
               menu.isSoldOut
                 ? "text-gray-500 bg-gray-200 cursor-not-allowed"
                 : "text-red-600 bg-red-100 hover:bg-red-200"

@@ -1,4 +1,4 @@
-import { MenuItem } from "@/types/menu";
+import { MenuItem } from "../types/menu";
 
 export const dummyMenu: MenuItem[] = [
   {
@@ -7,7 +7,7 @@ export const dummyMenu: MenuItem[] = [
     description:
       "Nasi goreng gurih dengan telur ceplok, sosis ayam, dan kerupuk udang.",
     price: 25000,
-    image: "https://placehold.co/400x300/e2e8f0/1e293b?text=Nasi+Goreng",
+    image: "https://placehold.co/400x300/e2e8f0/1e293b.png?text=Nasi+Goreng",
     category: "makanan",
     isSoldOut: false,
   },
@@ -16,7 +16,7 @@ export const dummyMenu: MenuItem[] = [
     name: "Es Lemon Tea",
     description: "Teh segar dengan perasan lemon asli dan es batu.",
     price: 12000,
-    image: "https://placehold.co/400x300/e2e8f0/1e293b?text=Lemon+Tea",
+    image: "https://placehold.co/400x300/e2e8f0/1e293b.png?text=Lemon+Tea",
     category: "minuman",
     isSoldOut: false,
   },
@@ -26,16 +26,16 @@ export const dummyMenu: MenuItem[] = [
     description:
       "Ayam goreng penyet dengan sambal ijo pedas mantap dan lalapan.",
     price: 28000,
-    image: "https://placehold.co/400x300/e2e8f0/1e293b?text=Ayam+Penyet",
+    image: "https://placehold.co/400x300/e2e8f0/1e293b.png?text=Ayam+Penyet",
     category: "makanan",
-    isSoldOut: true, // Ini contoh data menu yang lagi habis
+    isSoldOut: true,
   },
   {
     id: "menu-4",
     name: "Kentang Goreng",
     description: "Kentang goreng renyah dengan taburan garam laut.",
     price: 15000,
-    image: "https://placehold.co/400x300/e2e8f0/1e293b?text=Kentang+Goreng",
+    image: "https://placehold.co/400x300/e2e8f0/1e293b.png?text=Kentang+Goreng",
     category: "snack",
     isSoldOut: false,
   },

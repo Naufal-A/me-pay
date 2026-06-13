@@ -1,6 +1,10 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth, connectAuthEmulator } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { initializeApp, getApps, FirebaseApp } from "firebase/app";
+import { getAuth, connectAuthEmulator, Auth } from "firebase/auth";
+import {
+  getFirestore,
+  connectFirestoreEmulator,
+  Firestore,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "demo-key",
@@ -11,9 +15,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
 };
 
-let app: any;
-let auth: any;
-let db: any;
+let app: FirebaseApp;
+let auth: Auth;
+let db: Firestore;
 
 try {
   app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);

@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import Image from "next/image";
 
-export default function LoginPage() { // 1. Nama fungsi disesuaikan
+export default function LoginPage() {
+  // 1. Nama fungsi disesuaikan
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); // 2. State untuk pesan error
-  
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -20,7 +21,11 @@ export default function LoginPage() { // 1. Nama fungsi disesuaikan
     setErrorMessage("");
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const user = userCredential.user;
 
       const docRef = doc(db, "users", user.uid);
@@ -40,15 +45,20 @@ export default function LoginPage() { // 1. Nama fungsi disesuaikan
       } else if (userRole === "staff") {
         router.push("/dashboard/staff");
       } else {
-        router.push("/menu"); // Pelanggan yang iseng login dilempar ke menu
+        router.push("/menu");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
 
-      if (error?.code === "auth/invalid-credential") {
-        setErrorMessage("Email atau password salah!");
+      const firebaseErr = error as { code?: string; message?: string };
+
+      if (firebaseErr.code === "auth/invalid-credential") {
+        setErrorMessage(
+          "Terjadi kesalahan sistem: " +
+            (firebaseErr.message ?? "Unknown error"),
+        );
       } else {
-        setErrorMessage("Terjadi kesalahan sistem: " + (error?.message ?? "Unknown error"));
+        setErrorMessage("Email atau password salah!");
       }
     } finally {
       setLoading(false);
@@ -59,7 +69,7 @@ export default function LoginPage() { // 1. Nama fungsi disesuaikan
     <main className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="text-black text-center sm:mx-auto sm:w-full sm:max-w-md">
         <div className="p-10 pb-6 flex justify-center">
-          <img src="/next.svg" alt="logo" />
+          <Image src="/next.svg" width={100} height={100} alt="logo" />
         </div>
         <h1 className="text-2xl font-bold">Me-Pay Dashboard</h1>
         <p className="text-gray-500 mt-2">Login hanya untuk staf dan manajer</p>
@@ -67,14 +77,14 @@ export default function LoginPage() { // 1. Nama fungsi disesuaikan
 
       <form
         onSubmit={handleLogin}
-        className="text-black sm:mx-auto sm:w-full sm:max-w-md mt-8 bg-white px-12 py-8 rounded-2xl shadow-xl"
+        className="text-black sm:mx-auto sm:w-full sm:max-w-md mt-8 border-gray-300 bg-white px-12 py-8 rounded-2xl shadow-sm"
       >
         <div className="mb-4">
           <label className="block mb-2 font-medium">Email</label>
           <input
-            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             type="email"
-            placeholder="nama@email.com"
+            placeholder="nama@admin.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
@@ -83,7 +93,7 @@ export default function LoginPage() { // 1. Nama fungsi disesuaikan
         <div className="mb-6">
           <label className="block mb-2 font-medium">Password</label>
           <input
-            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             type="password"
             placeholder="••••••••"
             value={password}
@@ -103,7 +113,7 @@ export default function LoginPage() { // 1. Nama fungsi disesuaikan
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center border-transparent hover:bg-green-500 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl text-white px-6 py-2.5 bg-green-400 font-medium transition-colors"
+            className="w-full flex justify-center border-transparent hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed rounded-xl text-white px-6 py-2.5 bg-blue-500 font-medium transition-colors"
           >
             {loading ? "Memproses..." : "Login"}
           </button>

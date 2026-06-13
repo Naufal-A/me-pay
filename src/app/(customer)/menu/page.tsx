@@ -1,5 +1,7 @@
 import MenuCard from "@/components/MenuCard";
 import { dummyMenu } from "@/lib/dummy-data";
+import Image from "next/image";
+
 export default function Home() {
   // Mengelompokkan menu sekaligus melakukan normalisasi (anti huruf kapital/spasi berlebih)
   const groupedMenu = dummyMenu.reduce(
@@ -31,11 +33,12 @@ export default function Home() {
                       active:scale-95 flex hover:bg-gray-100 
                       p-3 rounded-full "
         >
-          <img
+          <Image
             className=""
             src="/img/shopping-cart.png"
             alt="logos"
             width={35}
+            height={25}
           />
         </div>
       </header>
@@ -59,7 +62,7 @@ export default function Home() {
               {kategori}
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-4 sm:gap-6">
               {items.map((menu) => (
                 <MenuCard key={menu.id} menu={menu} />
               ))}
