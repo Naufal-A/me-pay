@@ -46,3 +46,4 @@ Java HotSpot(TM) 64-Bit Server VM (build 26.0.1+8-34, mixed mode, sharing)
 
 Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
  
+[info] i  To reset your email address to 123@gmail.com, follow this link: http://127.0.0.1:9099/emulator/action?mode=recoverEmail&lang=en&oobCode=DK8MT4-z--FF_2e8VHa_bJO6z86veQEIoHWKT1XrUzvN2Zh2VDX_3N&apiKey=fake-api-key {"metadata":{"emulator":{"name":"auth"},"message":"To reset your email address to 123@gmail.com, follow this link: http://127.0.0.1:9099/emulator/action?mode=recoverEmail&lang=en&oobCode=DK8MT4-z--FF_2e8VHa_bJO6z86veQEIoHWKT1XrUzvN2Zh2VDX_3N&apiKey=fake-api-key"}}
