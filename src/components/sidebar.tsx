@@ -36,12 +36,13 @@ export default function Sidebar({ userRole }: { userRole: string }) {
   );
 
   return (
-    <aside className="w-64 min-h-screen bg-white border-r border-gray-200 p-6 flex flex-col">
-      <div className="my-2">
-        <h2 className="text-2xl font-bold text-blue-600">Me-Pay</h2>
+    <aside className="w-64 min-h-screen bg-white border-r border-gray-200 p-5 flex flex-col">
+      <div className="flex flex-row">
+        <h2 className="text-2xl font-bold text-black">Kantinia</h2>
+        <h2 className="text-2xl font-bold text-red-500 ">Ops</h2>
       </div>
       <div>
-        <hr className="border-t border-zinc-200 my-4" />
+        <hr className="border-t border-zinc-200 mt-5 mb-4" />
         <p className="text-sm text-gray-400 font-sans uppercase mb-4">
           WORKSPACE: {userRole}
         </p>
