@@ -40,6 +40,10 @@ export default function LoginPage() {
       const userData = docSnap.data();
       const userRole = userData.role;
 
+      // 👇 Tulis kode pembuatan cookie-nya di SINI 👇
+      // Ini akan membuat tiket masuk berdasarkan role manager/staff
+      document.cookie = `userRole=${userRole}; path=/; max-age=86400`;
+
       if (userRole === "manager") {
         router.push("/dashboard/manager");
       } else if (userRole === "staff") {
@@ -53,12 +57,12 @@ export default function LoginPage() {
       const firebaseErr = error as { code?: string; message?: string };
 
       if (firebaseErr.code === "auth/invalid-credential") {
+        setErrorMessage("Email atau password salah!");
+      } else {
         setErrorMessage(
           "Terjadi kesalahan sistem: " +
             (firebaseErr.message ?? "Unknown error"),
         );
-      } else {
-        setErrorMessage("Email atau password salah!");
       }
     } finally {
       setLoading(false);
