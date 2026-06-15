@@ -25,11 +25,14 @@ export function proxy(request: NextRequest) {
   }
 
   // Kalau sudah login, iseng buka halaman /login lagi
-  // if (userRole && url === "/login") {
-  //   return NextResponse.redirect(
-  //     new URL(userRole === "manager" ? "/dashboard/manager" : "/dashboard/staff", request.url)
-  //   );
-  // }
+  if (userRole && url === "/login") {
+    return NextResponse.redirect(
+      new URL(
+        userRole === "manager" ? "/dashboard/manager" : "/dashboard/staff",
+        request.url,
+      ),
+    );
+  }
 
   return NextResponse.next();
 }
