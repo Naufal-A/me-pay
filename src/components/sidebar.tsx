@@ -21,7 +21,7 @@ export default function Sidebar({ userRole }: { userRole: string }) {
     },
     {
       title: "Kelola Menu",
-      href: "/dashboard/manager/menu",
+      href: "/menu-management",
       roles: ["manager"],
     },
     {

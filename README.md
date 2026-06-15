@@ -1,143 +1,90 @@
-# me-pay
+# ME-Pay
 
-Aplikasi e-commerce berbasis Next.js dengan integrasi Firebase untuk authentication, Firestore database, dan hosting.
+Aplikasi web _self-service_ pemesanan dan pembayaran berbasis Next.js dengan integrasi Firebase untuk Authentication, Firestore Database, dan Hosting.
 
-## Quick Start
+---
 
+## 🚀 fast start
+
+```bash
 cd work/univ/124/rpl/me-pay
-
-### Run Development Server
-
-Di terminal baru, jalankan:
+```
 
 ```bash
 npm run dev
 ```
 
-kemudian jalankan:
-
-```bash
-npm run emulator
-```
-
-### Instalasi Dependencies
-
-```bash
-npm install
-```
-
-### Setup Firebase Lokal
-
-Pastikan Anda sudah login ke Firebase:
-
-```bash
-firebase login
-```
-
-Kemudian jalankan emulator Firebase:
-
 ```bash
 firebase emulators:start
 ```
 
----
+## 📁 Project Structure
 
+Struktur folder pada proyek ini menggunakan pola App Router dari Next.js yang dipisahkan berdasarkan _role_ pengguna:
+
+```text
 src/
 ├── app/
-│ │ ├── layout.tsx <-- Navbar/Footer khusus pembeli
-│ ├── (customer)/ <-- Halaman untuk pembeli
-│ │ ├── layout.tsx <-- Navbar/Footer khusus pembeli
-│ │ └── menu/
-│ │ └── page.tsx <-- Nampilin list menu (fetch dari DB)
-│ │
-│ ├── (admin)/ <-- Halaman khusus admin
-│ │ ├── layout.tsx <-- Sidebar dasbor admin
-│ │ └── dashboard/
-│ │ ├── page.tsx <-- Ringkasan/Statistik
-│ │ └── manage-menu/
-│ │ └── page.tsx <-- Tabel CRUD menu (Tambah, Edit, Delete)
-│ │
-│ └── layout.tsx <-- Navbar/Footer khusus pembeli
-│  
-├── api/ <-- Kalau butuh Route Handlers
-├── components/  
-│ ├── ui/ <-- Tombol, Input, dll
-│ └── MenuCard.tsx <-- Komponen card menu yang dipakai berulang
+│   ├── (customer)/            # Route group untuk pembeli
+│   │   ├── layout.tsx         # Navbar & Footer khusus pembeli
+│   │   └── menu/
+│   │       └── page.tsx       # Menampilkan list menu (Fetch dari DB)
+│   │
+│   ├── (admin)/               # Route group khusus admin
+│   │   ├── layout.tsx         # Sidebar dasbor admin
+│   │   └── dashboard/
+│   │       ├── page.tsx       # Ringkasan & Statistik
+│   │       └── manage-menu/
+│   │           └── page.tsx   # Tabel CRUD menu (Tambah, Edit, Delete)
+│   │
+│   └── layout.tsx             # Root layout aplikasi
 │
-└── lib/  
- └── db.ts <-- Konfigurasi koneksi database
+├── api/                       # Route Handlers (Backend API internal)
+├── components/
+│   ├── ui/                    # Reusable components (Tombol, Input, dll)
+│   └── MenuCard.tsx           # Komponen card menu
+│
+└── lib/
+    └── db.ts                  # Konfigurasi koneksi database Firebase
+```
 
 ---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started (Lengkap)
 
----
-
-## Firebase Configuration
-
-Repo ini sudah terintegrasi dengan Firebase project `me-pay-ab9a1`. Berikut konfigurasi yang ada:
-
-| Konfigurasi                 | Nilai                           |
-| --------------------------- | ------------------------------- |
-| **Project ID**              | `me-pay-ab9a1`                  |
-| **Region**                  | `asia-southeast2`               |
-| **Auth Emulator Port**      | `9099`                          |
-| **Firestore Emulator Port** | `8080`                          |
-| **Firestore UI**            | Enabled (http://localhost:4000) |
-
----
-
-## Setup Firebase (Lengkap)
+Ikuti langkah-langkah berikut untuk menjalankan proyek secara lokal.
 
 ### 1. Prerequisites
 
-- Node.js 16+ terinstall
-- Akun Google untuk Firebase
-- Git terinstall
+Pastikan Anda sudah menginstal:
 
-### 2. Install Firebase CLI
+- Node.js versi 16 atau lebih baru
+- Git
+- Akun Google untuk Firebase
+
+### 2. Instalasi Dependencies
+
+Buka terminal, masuk ke direktori proyek, dan jalankan:
+
+```bash
+cd work/univ/124/rpl/me-pay
+npm install
+```
+
+### 3. Setup Firebase CLI & Login
+
+Install Firebase CLI secara global (jika belum ada), lalu login ke akun Firebase Anda:
 
 ```bash
 npm install -g firebase-tools
-```
-
-Cek versi:
-
-```bash
-firebase --version
-```
-
-### 3. Login ke Firebase
-
-```bash
 firebase login
 ```
 
-Jika menggunakan SSH atau tidak ada browser:
+_(Catatan: Jika menggunakan SSH/tanpa browser, gunakan `firebase login --no-localhost`)_
 
-```bash
-firebase login --no-localhost
-```
+### 4. Konfigurasi Environment Variables
 
-### 4. Konfigurasi Project
-
-Project sudah dikonfigurasi di `.firebaserc`:
-
-```bash
-firebase use me-pay-ab9a1
-```
-
-### 5. Install Firebase SDK (Frontend)
-
-Untuk menggunakan Firebase di React/Next.js:
-
-```bash
-npm install firebase
-```
-
-### 6. Environment Variables
-
-Buat file `.env.local` di root project dengan config Firebase:
+Buat file `.env.local` di _root_ proyek dan isi dengan konfigurasi Firebase Anda:
 
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
@@ -148,57 +95,49 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
 
-### 7. Jalankan Emulator Lokal
+Set project aktif ke proyek yang sudah ada:
 
 ```bash
-firebase emulators:start
+firebase use me-pay-ab9a1
 ```
 
-Emulator UI akan tersedia di: http://localhost:4000
+### 5. Jalankan Development Server & Emulator
 
-### 8. Jalankan Development Server
+Anda perlu menjalankan server Next.js dan Firebase Emulator secara bersamaan (gunakan dua terminal terpisah):
 
-Di terminal baru:
+**Terminal 1 (Next.js):**
 
 ```bash
 npm run dev
 ```
 
----
+Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-## Firebase Services
+**Terminal 2 (Firebase Emulator):**
 
-### Firestore Database
-
-- **Lokasi**: `asia-southeast2`
-- **Rules**: Defined in `firestore.rules`
-- **Indexes**: Configured in `firestore.indexes.json`
-- **Emulator**: Port 8080
-
-### Authentication
-
-- **Emulator**: Port 9099
-- **Providers**: Dapat dikonfigurasi di `firebase.json`
-
----
-
-## Project Structure
-
-```
-me-pay/
-├── app/                    # Next.js app directory
-├── public/                 # Static files
-├── .firebaserc            # Firebase project config
-├── firebase.json          # Firebase emulator config
-├── firestore.rules        # Firestore security rules
-├── firestore.indexes.json # Firestore indexes
-├── package.json           # Dependencies
-└── README.md              # This file
+```bash
+firebase emulators:start
 ```
 
+Buka Emulator UI di [http://localhost:4000](http://localhost:4000) untuk memantau Firestore dan Auth lokal.
+
 ---
 
-## File Firebase yang Penting
+## ⚙️ Firebase Configuration
+
+Repo ini sudah terintegrasi dengan Firebase project `me-pay-ab9a1`.
+
+### Layanan & Port Lokal
+
+| Konfigurasi                 | Nilai                           |
+| --------------------------- | ------------------------------- |
+| **Project ID**              | `me-pay-ab9a1`                  |
+| **Region**                  | `asia-southeast2`               |
+| **Auth Emulator Port**      | `9099`                          |
+| **Firestore Emulator Port** | `8080`                          |
+| **Firestore UI**            | Enabled (http://localhost:4000) |
+
+### File Konfigurasi Penting
 
 | File                     | Deskripsi                                    |
 | ------------------------ | -------------------------------------------- |
@@ -207,77 +146,53 @@ me-pay/
 | `firestore.rules`        | Security rules Firestore                     |
 | `firestore.indexes.json` | Index configuration untuk query optimization |
 
-> ⚠️ **Penting**: `firestore.rules` saat ini membuka akses baca/tulis sementara sampai `2026-07-12`. Update dengan security rules yang lebih ketat sebelum production.
+> ⚠️ **Penting**: `firestore.rules` saat ini membuka akses baca/tulis sementara sampai `2026-07-12`. Pastikan untuk mengupdate dengan _security rules_ yang lebih ketat sebelum rilis ke _production_.
 
 ---
 
-## Deployment
+## 📦 Deployment
 
-### Deploy ke Firebase Hosting
+Pastikan Anda sudah melakukan _build_ sebelum _deploy_ ke Firebase Hosting.
 
 ```bash
 npm run build
 firebase deploy
 ```
 
-### Deploy Hanya Firestore Rules
+**Deploy Layanan Spesifik:**
 
 ```bash
+# Deploy Hanya Firestore Rules
 firebase deploy --only firestore:rules
-```
 
-### Deploy Hanya Database
-
-```bash
+# Deploy Hanya Database Firestore
 firebase deploy --only firestore
 ```
 
 ---
 
-## Troubleshooting
+## 🛠️ Troubleshooting
 
-### Emulator tidak mau start
-
-```bash
-# Bersihkan dan restart
-firebase emulators:start --only firestore,auth
-```
-
-### Permission denied saat login
-
-```bash
-firebase logout
-firebase login --no-localhost
-```
-
-### Port already in use
-
-Ganti port di `firebase.json` atau kill process yang menggunakan port tersebut.
+- **Emulator tidak mau start / nyangkut:**
+  Bersihkan _cache_ proses dengan menjalankan:
+  ```bash
+  firebase emulators:start --only firestore,auth
+  ```
+- **Permission denied saat login Firebase:**
+  ```bash
+  firebase logout
+  firebase login --no-localhost
+  ```
+- **Port already in use:**
+  Ganti port yang bentrok di file `firebase.json` atau matikan (_kill_) proses yang menggunakan port tersebut.
 
 ---
 
-## Useful Commands
+## 📚 Useful Commands & Resources
 
-```bash
-# List emulators
-firebase emulators:exec "echo 'test'"
-
-# Clear emulator data
-firebase emulators:start --import=./emulator-data --export-on-exit
-
-# Deploy everything
-firebase deploy
-
-# Deploy specific service
-firebase deploy --only firestore:rules,firestore
-```
-
----
-
-## Learn More
+**Dokumentasi:**
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [Firestore Guide](https://firebase.google.com/docs/firestore)
-- [Firebase CLI Reference](https://firebase.google.com/docs/cli)
 - [Firebase Emulator Suite](https://firebase.google.com/docs/emulator-suite)
