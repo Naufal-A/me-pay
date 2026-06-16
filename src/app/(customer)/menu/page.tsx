@@ -1,17 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import MenuCard from "@/components/MenuCard";
-import MenuDetailSheet from "@/components/MenuDetailSheet";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Menu } from "@/types/menu";
+import { useCartStore } from "@/store/cartStore"; // ← cart store
+import MenuCard from "@/components/MenuCard";
+import MenuDetailSheet from "@/components/MenuDetailSheet";
 
 export default function Home() {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
+
+  // 1. State isMounted untuk mencegah Hydration Mismatch
+  const [isMounted, setIsMounted] = useState(false);
+
+  const router = useRouter();
+  
+  // Mengambil state secara spesifik sangat disarankan di Zustand
+  const addItem = useCartStore((state) => state.addItem);
+  const cartItems = useCartStore((state) => state.items) || []; 
+  
+  // Hitung cartCount dari array items agar reaktivitasnya aman dan tidak bocor saat SSR
+  const cartCount = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+
+  // 2. Set isMounted ke true hanya setelah komponen berhasil di-render di client (browser)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchCustomerMenu = async () => {
@@ -56,8 +76,7 @@ export default function Home() {
   });
 
   const handleAddToCart = (menu: Menu, quantity: number, note: string) => {
-    // TODO: integrasikan dengan cart state / Firestore kamu di sini
-    console.log("Ditambahkan ke keranjang:", { menu, quantity, note });
+    addItem(menu, quantity, note);
   };
 
   return (
@@ -67,9 +86,14 @@ export default function Home() {
           <h1 className="text-black text-2xl font-bold">Kantinia</h1>
           <p className="text-zinc-600 text-xs">self service</p>
         </div>
-        <div
-          className="transition-all duration-100 active:scale-95 flex
-                     hover:bg-gray-100 p-3 rounded-full"
+
+        {/* Tombol Cart dengan badge jumlah item */}
+        <button
+          onClick={() => router.push("/cart")}
+          className="relative transition-all duration-100 active:scale-95
+                     flex hover:bg-gray-100 p-3 rounded-full"
+          // 3. Aria-label aman karena dilindungi isMounted
+          aria-label={`Keranjang, ${isMounted ? cartCount : 0} item`}
         >
           <Image
             src="/img/shopping-cart.png"
@@ -77,7 +101,15 @@ export default function Home() {
             width={35}
             height={25}
           />
-        </div>
+          {/* 4. Badge merah baru akan dirender jika isMounted true (browser) */}
+          {isMounted && cartCount > 0 && (
+            <span className="absolute top-1 right-1 bg-red-600 text-white text-xs
+                             font-bold w-5 h-5 rounded-full flex items-center justify-center
+                             leading-none">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+        </button>
       </header>
 
       <div className="bg-red-600 px-4 pt-4 pb-8 mb-4 rounded-b-3xl">
@@ -123,7 +155,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* Bottom Sheet — key={selectedMenu?.id} supaya state reset otomatis tiap menu baru */}
       <MenuDetailSheet
         key={selectedMenu?.id ?? "closed"}
         menu={selectedMenu}

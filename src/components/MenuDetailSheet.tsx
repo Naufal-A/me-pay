@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Menu } from "@/types/menu";
+import { formatRupiah } from "@/lib/format"; // ← import dari utils
 
 interface MenuDetailSheetProps {
   menu: Menu | null;
@@ -19,26 +20,22 @@ export default function MenuDetailSheet({
   const [note, setNote] = useState("");
   const sheetRef = useRef<HTMLDivElement>(null);
 
-  // Tutup sheet kalau klik backdrop
   useEffect(() => {
     const handleBackdropClick = (e: MouseEvent) => {
       if (sheetRef.current && !sheetRef.current.contains(e.target as Node)) {
         onClose();
       }
     };
-
     if (menu) {
       document.addEventListener("mousedown", handleBackdropClick);
       document.body.style.overflow = "hidden";
     }
-
     return () => {
       document.removeEventListener("mousedown", handleBackdropClick);
       document.body.style.overflow = "";
     };
   }, [menu, onClose]);
 
-  // Tutup dengan Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -51,15 +48,6 @@ export default function MenuDetailSheet({
 
   const totalHarga = menu.price * quantity;
 
-  const formatRupiah = (amount: number) =>
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    })
-      .format(amount)
-      .replace("IDR", "Rp");
-
   const handleAdd = () => {
     onAddToCart(menu, quantity, note);
     onClose();
@@ -67,16 +55,11 @@ export default function MenuDetailSheet({
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 z-40 transition-opacity duration-300"
         aria-hidden="true"
       />
 
-      {/*
-        Di mobile  → bottom sheet (slide dari bawah, full width)
-        Di sm ke atas → modal di tengah layar (max-w-lg, rounded semua sisi)
-      */}
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
         <div
           ref={sheetRef}
@@ -94,12 +77,10 @@ export default function MenuDetailSheet({
             flex flex-col
           "
         >
-          {/* Drag handle — hanya tampil di mobile */}
           <div className="flex justify-center pt-3 pb-1 sm:hidden">
             <div className="w-10 h-1 rounded-full bg-gray-300" />
           </div>
 
-          {/* Foto Menu */}
           <div className="relative w-full h-52 sm:h-64 bg-gray-100 shrink-0 sm:rounded-t-3xl overflow-hidden">
             {menu.image ? (
               <Image
@@ -115,7 +96,6 @@ export default function MenuDetailSheet({
               </div>
             )}
 
-            {/* Tombol Tutup */}
             <button
               onClick={onClose}
               aria-label="Tutup"
@@ -139,10 +119,7 @@ export default function MenuDetailSheet({
             </button>
           </div>
 
-          {/* Konten */}
           <div className="px-5 pt-5 pb-8 flex flex-col gap-5 flex-1">
-
-            {/* Nama, Deskripsi, Harga */}
             <div className="flex flex-col gap-1">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
                 {menu.name}
@@ -153,19 +130,14 @@ export default function MenuDetailSheet({
                 </p>
               )}
               <p className="text-gray-900 font-bold text-lg mt-1">
-                {formatRupiah(menu.price)}
+                {formatRupiah(menu.price)} {/* ← pakai utils */}
               </p>
             </div>
 
-            {/* Divider */}
             <div className="border-t border-gray-100" />
 
-            {/* Catatan Khusus */}
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="catatan"
-                className="text-sm font-semibold text-gray-800"
-              >
+              <label htmlFor="catatan" className="text-sm font-semibold text-gray-800">
                 Catatan Khusus{" "}
                 <span className="font-normal text-gray-400">(Opsional)</span>
               </label>
@@ -184,11 +156,9 @@ export default function MenuDetailSheet({
               />
             </div>
 
-            {/* Quantity Selector */}
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-800">Jumlah</span>
               <div className="flex items-center gap-4">
-                {/* Tombol Kurang */}
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1}
@@ -200,24 +170,15 @@ export default function MenuDetailSheet({
                     disabled:opacity-40 disabled:cursor-not-allowed
                   "
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
                   </svg>
                 </button>
 
-                {/* Angka */}
                 <span className="text-xl font-bold text-gray-900 w-6 text-center tabular-nums">
                   {quantity}
                 </span>
 
-                {/* Tombol Tambah */}
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
                   aria-label="Tambah jumlah"
@@ -227,21 +188,13 @@ export default function MenuDetailSheet({
                     text-gray-700 hover:bg-gray-100 active:scale-95 transition-all
                   "
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
                 </button>
               </div>
             </div>
 
-            {/* Tombol Tambah ke Pesanan */}
             <button
               onClick={handleAdd}
               className="
@@ -255,7 +208,7 @@ export default function MenuDetailSheet({
               "
             >
               <span>Tambah ke Pesanan</span>
-              <span className="font-bold">{formatRupiah(totalHarga)}</span>
+              <span className="font-bold">{formatRupiah(totalHarga)}</span> {/* ← pakai utils */}
             </button>
           </div>
         </div>
