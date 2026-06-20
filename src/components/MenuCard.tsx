@@ -47,18 +47,8 @@ export default function MenuCard({ menu }: { menu: Menu }) {
           <p className="font-bold text-red-600 whitespace-nowrap">
             Rp {menu.price.toLocaleString("id-ID")}
           </p>
-
-          {/* Tombol Tambah (+) */}
-          <button
-            disabled={isSoldOut}
-            className={`rounded-full px-4 py-1.5 font-bold transition-colors ${
-              isSoldOut
-                ? "text-gray-500 bg-gray-200 cursor-not-allowed"
-                : "text-red-600 bg-red-100 hover:bg-red-200"
-            }`}
-          >
-            {isSoldOut ? "-" : "+"}
-          </button>
+        
+       
         </div>
       </div>
     </div>
