@@ -45,9 +45,9 @@ export default function LoginPage() {
       document.cookie = `userRole=${userRole}; path=/; max-age=86400`;
 
       if (userRole === "manager") {
-        router.push("/dashboard/manager");
+        router.push("/dashboard/manager/statistic");
       } else if (userRole === "staff") {
-        router.push("/dashboard/staff");
+        router.push("/dashboard/payment");
       } else {
         router.push("/menu");
       }

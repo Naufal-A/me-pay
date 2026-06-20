@@ -5,10 +5,11 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "placehold.co",
-      },
+      // dummy image
+      // {
+      //   protocol: "https",
+      //   hostname: "placehold.co",
+      // },
       // Nanti kalau kamu udah pakai Firebase Storage, tambahkan domainnya di sini juga
       // {
       //   protocol: 'https',
