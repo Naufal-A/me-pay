@@ -16,19 +16,27 @@ export function proxy(request: NextRequest) {
 
   // Kalau role-nya STAFF, tapi maksa buka URL manager
   if (userRole === "staff" && url.startsWith("/dashboard/manager")) {
-    return NextResponse.redirect(new URL("/dashboard/staff", request.url));
+    return NextResponse.redirect(new URL("/dashboard/payment", request.url));
   }
 
   // Kalau role-nya MANAGER, tapi nyasar ke URL staff
-  if (userRole === "manager" && url.startsWith("/dashboard/staff")) {
-    return NextResponse.redirect(new URL("/dashboard/manager", request.url));
+  if (
+    userRole === "manager" &&
+    (url.startsWith("/dashboard/payment") ||
+      url.startsWith("/dashboard/orders"))
+  ) {
+    return NextResponse.redirect(
+      new URL("/dashboard/manager/statistic", request.url),
+    );
   }
 
   // Kalau sudah login, iseng buka halaman /login lagi
   if (userRole && url === "/login") {
     return NextResponse.redirect(
       new URL(
-        userRole === "manager" ? "/dashboard/manager" : "/dashboard/staff",
+        userRole === "manager"
+          ? "/dashboard/manager/statistic"
+          : "/dashboard/payment",
         request.url,
       ),
     );
@@ -39,5 +47,5 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Matcher-nya diubah jadi /dashboard/...
-  matcher: ["/dashboard/manager/:path*", "/dashboard/staff/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/login"],
 };

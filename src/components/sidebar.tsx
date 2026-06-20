@@ -10,23 +10,23 @@ export default function Sidebar({ userRole }: { userRole: string }) {
 
   const menuItems = [
     {
-      title: "Beranda",
-      href: `/dashboard/${userRole}`,
-      roles: ["manager", "staff"],
+      title: "Payment que",
+      href: `/dashboard/payment`,
+      roles: ["staff"],
     },
     {
       title: "Pesanan Masuk",
-      href: "/dashboard/staff/orders",
-      roles: ["manager", "staff"],
-    },
-    {
-      title: "Kelola Menu",
-      href: "/menu-management",
-      roles: ["manager"],
+      href: "/dashboard/orders",
+      roles: ["staff"],
     },
     {
       title: "Laporan Penjualan",
-      href: "/dashboard/manager/reports",
+      href: "/dashboard/manager/statistic",
+      roles: ["manager"],
+    },
+    {
+      title: "Kelola Menu",
+      href: "/dashboard/manager/menu-management",
       roles: ["manager"],
     },
   ];
