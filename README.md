@@ -15,7 +15,7 @@ npm run dev
 ```
 
 ```bash
-firebase emulators:start
+firebase emulators:start --export-on-exit=./saved-data --import=./saved-data
 ```
 
 ## 📁 Project Structure
