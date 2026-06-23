@@ -32,9 +32,18 @@ export default function CartPage() {
 
     try {
       await addDoc(collection(db, "orders"), {
-        tableNumber: tableNumber ?? "unknown",
-        status: "pending",
-        paymentMethod,
+        // Tambahkan nomor pesanan acak yang unik untuk UI kasir
+        orderNumber: `#ORD-${Math.floor(Date.now() / 1000)
+          .toString()
+          .slice(-4)}`,
+        tableNumber: tableNumber ?? "Takeaway",
+        customerName: "Pelanggan", // Nama default, bisa dikembangkan nanti
+
+        // Pemisahan status yang jelas antara Dapur dan Kasir
+        orderStatus: "pending",
+        paymentMethod: paymentMethod, // "qris" | "kasir"
+        paymentStatus: paymentMethod === "kasir" ? "unpaid" : "paid",
+
         totalPrice: totalPrice(),
         createdAt: serverTimestamp(),
         items: items.map((item) => ({
@@ -49,7 +58,7 @@ export default function CartPage() {
       });
 
       clearCart();
-      router.push("/order-success");
+      router.push("/order-success"); // Pastikan halaman ini sudah ada atau buat placeholder-nya
     } catch (error) {
       console.error("Gagal membuat pesanan:", error);
       alert("Gagal mengirim pesanan. Coba lagi.");
