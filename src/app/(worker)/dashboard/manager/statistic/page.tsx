@@ -414,7 +414,7 @@ export default function StatisticsPage() {
           </div>
         ) : (
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
                   data={bestSellingData}
