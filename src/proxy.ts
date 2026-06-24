@@ -2,24 +2,38 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
-  // 1. Ambil tiket (cookie) yang tadi kita buat pas login
+  const url = request.nextUrl.pathname;
+
+  // ── 1. Proteksi order-success: hanya bisa diakses setelah checkout ──
+  if (url === "/order-success") {
+    const hasOrderSuccess =
+      request.cookies.get("order_success")?.value === "true";
+
+    if (!hasOrderSuccess) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    // Cookie ada → boleh masuk, langsung hapus supaya tidak bisa refresh
+    const response = NextResponse.next();
+    response.cookies.delete("order_success");
+    return response;
+  }
+
+  // ── 2. Role-based dashboard protection ────────────────────────────────
   const roleCookie = request.cookies.get("userRole");
   const userRole = roleCookie?.value;
 
-  // 2. Cek URL mana yang sedang mau dibuka oleh pengguna
-  const url = request.nextUrl.pathname;
-
-  // Cek jika belum login tapi mau buka area dashboard
+  // Belum login tapi mau buka area dashboard
   if (!userRole && url.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Kalau role-nya STAFF, tapi maksa buka URL manager
+  // Role STAFF tapi maksa buka URL manager
   if (userRole === "staff" && url.startsWith("/dashboard/manager")) {
     return NextResponse.redirect(new URL("/dashboard/payment", request.url));
   }
 
-  // Kalau role-nya MANAGER, tapi nyasar ke URL staff
+  // Role MANAGER tapi nyasar ke URL staff
   if (
     userRole === "manager" &&
     (url.startsWith("/dashboard/payment") ||
@@ -30,7 +44,7 @@ export function proxy(request: NextRequest) {
     );
   }
 
-  // Kalau sudah login, iseng buka halaman /login lagi
+  // Sudah login tapi iseng buka /login lagi
   if (userRole && url === "/login") {
     return NextResponse.redirect(
       new URL(
@@ -46,6 +60,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Matcher-nya diubah jadi /dashboard/...
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/login", "/order-success"],
 };

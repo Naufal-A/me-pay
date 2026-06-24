@@ -58,6 +58,11 @@ export default function CartPage() {
       });
 
       clearCart();
+      // ✅ Set cookie sebagai "tiket masuk" ke halaman order-success
+      // Max-age 30 detik — cukup untuk redirect, tidak bisa disimpan lama
+      document.cookie =
+        "order_success=true; path=/; max-age=30; SameSite=Strict";
+
       router.push("/order-success"); // Pastikan halaman ini sudah ada atau buat placeholder-nya
     } catch (error) {
       console.error("Gagal membuat pesanan:", error);
