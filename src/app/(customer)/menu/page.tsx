@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Menu } from "@/types/menu";
@@ -14,22 +14,33 @@ export default function Home() {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const addItem = useCartStore((state) => state.addItem);
   const cartItems = useCartStore((state) => state.items) || [];
-  const cartCount = cartItems.reduce(
-    (acc, item) => acc + (item.quantity || 1),
-    0,
+  const setTableNumber = useCartStore((state) => state.setTableNumber);
+  const tableNumber = useCartStore((state) => state.tableNumber);
+
+  const cartCount = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+
+  // Mencegah Hydration Mismatch antara Server & Client (Zustand Persist)
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
   );
 
+  // ✅ PERBAIKAN UTAMA: Membaca nomor meja menggunakan searchParams bawaan Next.js
   useEffect(() => {
-    // eslint-disable-next-line
-    setIsMounted(true);
-  }, []);
+    const meja = searchParams.get("meja");
+    if (meja) {
+      setTableNumber(meja);
+    }
+  }, [searchParams, setTableNumber]);
 
+  // Fetch data menu aktif dari Firestore
   useEffect(() => {
     const fetchCustomerMenu = async () => {
       try {
@@ -51,6 +62,7 @@ export default function Home() {
     fetchCustomerMenu();
   }, []);
 
+  // Pengelompokan Menu Berdasarkan Kategori
   const groupedMenu = menus.reduce(
     (hasil, item) => {
       const kategoriAman = item.category || "Lainnya";
@@ -62,7 +74,8 @@ export default function Home() {
     {} as Record<string, Menu[]>,
   );
 
-  const prioritasKategori = ["makanan", "cemilan", "dessert", "minuman"];
+  // Urutan Kategori Menu
+  const prioritasKategori = ["makanan", "dessert", "minuman"];
   const kategoriTersusun = Object.keys(groupedMenu).sort((a, b) => {
     const posA = prioritasKategori.indexOf(a);
     const posB = prioritasKategori.indexOf(b);
@@ -77,99 +90,88 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-gray-50 min-h-screen font-sans">
-      {/* ── HEADER: sticky, z-50, selalu paling depan ── */}
-      <header className="sticky top-0 z-40 bg-white px-4 py-3.5 flex items-center justify-between border-b border-gray-100 shadow-sm">
+    <main className="bg-gray-50 min-h-screen font-sans flex-1">
+      {/* Header Aplikasi */}
+      <header className="bg-white pl-4 pr-3 py-4 flex items-center justify-between">
         <div className="flex flex-col">
-          <h1 className="text-gray-900 text-xl font-bold tracking-tight">
-            Kantinita
-          </h1>
-          <p className="text-xs text-gray-500">Self-Service</p>
+          <h1 className="text-black text-2xl font-bold">Kantinita</h1>
+          <p className="text-zinc-600 text-xs">
+            {isMounted && tableNumber ? `Meja ${tableNumber}` : "Self-Service"}
+          </p>
         </div>
 
+        {/* Tombol Menuju Keranjang Belanja */}
         <button
           onClick={() => router.push("/cart")}
-          className="relative transition-all duration-100 active:scale-95 flex hover:bg-gray-100 p-2.5 rounded-full"
+          className="relative transition-all duration-100 active:scale-95 flex hover:bg-gray-100 p-3 rounded-full"
           aria-label={`Keranjang, ${isMounted ? cartCount : 0} item`}
         >
           <Image
             src="/img/shopping-cart.png"
             alt="keranjang"
-            width={28}
-            height={28}
+            width={35}
+            height={25}
           />
           {isMounted && cartCount > 0 && (
-            <span className="absolute top-0.5 right-0.5 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+            <span
+              className="absolute top-1 right-1 bg-red-600 text-white text-xs
+                         font-bold w-5 h-5 rounded-full flex items-center
+                         justify-center leading-none"
+            >
               {cartCount > 99 ? "99+" : cartCount}
             </span>
           )}
         </button>
       </header>
 
-      {/* ── WRAPPER: posisi relative, jadi parent untuk sticky banner ── */}
-      <div className="relative">
-        {/* ── BANNER MERAH: sticky di bawah header (top = tinggi header ≈ 61px) ── */}
-        {/* z-0 → ada di BELAKANG card konten yang z-10 */}
-        <div className="sticky top-19 z-0 bg-red-600 px-4 pt-4 pb-24 rounded-b-3xl">
-          <h2 className="text-white text-2xl font-bold leading-tight">
-            Mau makan apa hari ini?
-          </h2>
-          <p className="text-red-200 text-xs mt-1 font-medium">
-            Pilih menu favoritmu tanpa antre
-          </p>
-        </div>
-
-        {/* ── KONTEN CARD: z-10 → scroll di ATAS banner merah ── */}
-        {/* -mt-14 biar card naik dan "menutupi" bagian bawah banner */}
-        <div className="relative z-10 -mt-14 mx-3 rounded-2xl bg-gray-50 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] px-3 pt-4 pb-10 min-h-screen">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-2 text-gray-400">
-              <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm font-medium">Memuat daftar menu...</p>
-            </div>
-          ) : menus.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-3xl mb-2">🍽️</p>
-              <p className="text-gray-500 font-medium text-sm">
-                Yah, belum ada menu yang tersedia.
-              </p>
-            </div>
-          ) : (
-            kategoriTersusun.map((kategori) => {
-              const items = groupedMenu[kategori];
-              return (
-                <section key={kategori} className="mb-6">
-                  {/* Label kategori */}
-                  <h3 className="text-base font-bold text-gray-800 mb-3 capitalize flex items-center gap-2">
-                    <span className="w-1 h-4 bg-red-500 rounded-full inline-block" />
-                    {kategori}
-                  </h3>
-
-                  {/* 3. PERUBAHAN GRID: minmax diperkecil ke 280px & gap dirapatkan agar lebih padat di HP */}
-                  <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 sm:gap-4">
-                    {items.map((menu) => (
-                      <div
-                        key={menu.id}
-                        onClick={() => {
-                          if (menu.isAvailable) setSelectedMenu(menu);
-                        }}
-                        className={
-                          menu.isAvailable
-                            ? "cursor-pointer"
-                            : "cursor-not-allowed"
-                        }
-                      >
-                        <MenuCard menu={menu} />
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              );
-            })
-          )}
-        </div>
+      {/* Banner Slogan */}
+      <div className="bg-red-600 px-4 pt-4 pb-8 mb-4 rounded-b-3xl">
+        <h1 className="text-white text-3xl font-bold mb-1">
+          Mau makan apa hari ini?
+        </h1>
+        <p className="text-gray-100">Pilih menu favoritmu tanpa antre</p>
       </div>
 
+      {/* Grid Menu Section */}
+      <div className="flex flex-col px-4 gap-3 mb-9">
+        {isLoading ? (
+          <div className="text-center py-10 text-gray-500 font-medium">
+            Memuat daftar menu...
+          </div>
+        ) : menus.length === 0 ? (
+          <div className="text-center py-10 text-gray-500 font-medium">
+            Yah, belum ada menu yang tersedia.
+          </div>
+        ) : (
+          kategoriTersusun.map((kategori) => {
+            const items = groupedMenu[kategori];
+            return (
+              <section key={kategori} className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 capitalize border-b border-gray-200 pb-2">
+                  {kategori}
+                </h2>
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-4 sm:gap-6">
+                  {items.map((menu) => (
+                    <div
+                      key={menu.id}
+                      onClick={() => {
+                        if (menu.isAvailable) setSelectedMenu(menu);
+                      }}
+                      className={
+                        menu.isAvailable ? "cursor-pointer" : "cursor-not-allowed"
+                      }
+                    >
+                      <MenuCard menu={menu} />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            );
+          })
+        )}
+      </div>
+
+      {/* Bottom Sheet Detail Menu */}
       <MenuDetailSheet
         key={selectedMenu?.id ?? "closed"}
         menu={selectedMenu}

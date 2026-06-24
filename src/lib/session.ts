@@ -10,4 +10,4 @@ export function getTableFromUrl(): string | null {
 
   const params = new URLSearchParams(window.location.search);
   return params.get("meja"); // contoh URL: /menu?meja=3
-}
+} 
