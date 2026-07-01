@@ -8,6 +8,7 @@ import {
   onSnapshot,
   orderBy,
   or,
+  and,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import KitchenOrderCard, { KitchenOrder } from "@/components/KitchenOrderCard";
@@ -24,7 +25,7 @@ function EmptyState() {
         Belum ada pesanan masuk
       </p>
       <p className="text-gray-300 text-xs max-w-xs">
-        Pesanan yang sudah dibayar akan muncul di sini secara otomatis
+        Pesanan QRIS yang sudah dibayar dan pesanan kasir akan muncul di sini
       </p>
     </div>
   );
@@ -38,19 +39,21 @@ export default function KitchenOrdersPage() {
 
   useEffect(() => {
     /*
-      Tampilkan order yang sudah siap dimasak:
-      - QRIS  → paymentStatus: "paid" + orderStatus: "pending"
-      - Kasir → paymentStatus: "paid" + orderStatus: "processing"
-      Keduanya berarti sudah bayar dan belum selesai dibuat.
-
-      Firestore tidak support OR di where() secara native sebelum v9.8,
-      jadi kita query dengan filter: paymentStatus == "paid" AND orderStatus != "done"
+      Tampilkan order yang perlu diproses dapur:
+      - QRIS  → hanya jika paymentStatus == "paid" (otomatis dari simulator)
+      - Kasir → tampil meski masih "unpaid", supaya kasir bisa konfirmasi manual
+      Ditambah orderStatus masih pending/processing (belum "done").
     */
     const q = query(
       collection(db, "orders"),
-      where("paymentStatus", "==", "paid"),
-      where("orderStatus", "in", ["pending", "processing"]),
-      orderBy("createdAt", "asc"), // yang paling lama menunggu tampil duluan
+      and(
+        where("orderStatus", "in", ["pending", "processing"]),
+        or(
+          where("paymentStatus", "==", "paid"),
+          where("paymentMethod", "==", "kasir")
+        )
+      ),
+      orderBy("createdAt", "asc"),
     );
 
     const unsub = onSnapshot(
@@ -79,7 +82,7 @@ export default function KitchenOrdersPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Kitchen Orders</h1>
           <p className="text-sm text-gray-400 mt-0.5">
-            Prepare these paid orders sequentially.
+            Prepare these orders sequentially.
           </p>
         </div>
 

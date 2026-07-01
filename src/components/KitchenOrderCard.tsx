@@ -49,17 +49,30 @@ function timeAgo(date: Date): string {
 
 // ─── Payment Badge ─────────────────────────────────────────────────────────────
 
-function PaymentBadge({ method }: { method: "qris" | "kasir" }) {
+function PaymentBadge({
+  method,
+  status,
+}: {
+  method: "qris" | "kasir";
+  status: "unpaid" | "paid";
+}) {
   return (
-    <span
-      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${
-        method === "qris"
-          ? "bg-blue-100 text-blue-600"
-          : "bg-green-100 text-green-600"
-      }`}
-    >
-      {method === "qris" ? "QRIS" : "Kasir"}
-    </span>
+    <div className="flex items-center gap-1.5">
+      <span
+        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${
+          method === "qris"
+            ? "bg-blue-100 text-blue-600"
+            : "bg-green-100 text-green-600"
+        }`}
+      >
+        {method === "qris" ? "QRIS" : "Kasir"}
+      </span>
+      {status === "unpaid" && (
+        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide bg-amber-100 text-amber-600">
+          Belum Bayar
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -75,7 +88,11 @@ export default function KitchenOrderCard({
   onMarkedDone,
 }: KitchenOrderCardProps) {
   const [isMarking, setIsMarking] = useState(false);
+  const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
   const createdDate = order.createdAt?.toDate();
+
+  const needsPaymentConfirmation =
+    order.paymentMethod === "kasir" && order.paymentStatus === "unpaid";
 
   const handleMarkDone = async () => {
     setIsMarking(true);
@@ -90,6 +107,20 @@ export default function KitchenOrderCard({
       alert("Gagal update. Coba lagi.");
     } finally {
       setIsMarking(false);
+    }
+  };
+
+  const handleConfirmPayment = async () => {
+    setIsConfirmingPayment(true);
+    try {
+      await updateDoc(doc(db, "orders", order.id), {
+        paymentStatus: "paid",
+      });
+    } catch (err) {
+      console.error("Gagal konfirmasi pembayaran:", err);
+      alert("Gagal konfirmasi pembayaran. Coba lagi.");
+    } finally {
+      setIsConfirmingPayment(false);
     }
   };
 
@@ -114,7 +145,7 @@ export default function KitchenOrderCard({
               {formatTime(createdDate)}
             </span>
           )}
-          <PaymentBadge method={order.paymentMethod} />
+          <PaymentBadge method={order.paymentMethod} status={order.paymentStatus} />
         </div>
       </div>
 
@@ -125,7 +156,6 @@ export default function KitchenOrderCard({
       <div className="px-4 py-3 flex flex-col gap-3 flex-1">
         {order.items.map((item, i) => (
           <div key={i} className="flex items-start gap-3">
-            {/* Thumbnail */}
             <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-gray-100 shrink-0 mt-0.5">
               {item.image ? (
                 <Image
@@ -142,7 +172,6 @@ export default function KitchenOrderCard({
               )}
             </div>
 
-            {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex justify-between gap-2 items-start">
                 <div className="flex items-center gap-1.5 min-w-0">
@@ -202,39 +231,75 @@ export default function KitchenOrderCard({
         )}
 
         {/* CTA */}
-        <button
-          onClick={handleMarkDone}
-          disabled={isMarking}
-          className="w-full bg-orange-500 hover:bg-orange-600 active:scale-[0.98]
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     text-white text-sm font-bold rounded-xl py-3
-                     transition-all duration-150 flex items-center justify-center gap-2"
-        >
-          {isMarking ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Memproses...
-            </>
-          ) : (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-              Mark as Ready / Served
-            </>
-          )}
-        </button>
+        {needsPaymentConfirmation ? (
+          <button
+            onClick={handleConfirmPayment}
+            disabled={isConfirmingPayment}
+            className="w-full bg-amber-500 hover:bg-amber-600 active:scale-[0.98]
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       text-white text-sm font-bold rounded-xl py-3
+                       transition-all duration-150 flex items-center justify-center gap-2"
+          >
+            {isConfirmingPayment ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Memproses...
+              </>
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2"
+                  />
+                </svg>
+                Konfirmasi Sudah Bayar
+              </>
+            )}
+          </button>
+        ) : (
+          <button
+            onClick={handleMarkDone}
+            disabled={isMarking}
+            className="w-full bg-orange-500 hover:bg-orange-600 active:scale-[0.98]
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       text-white text-sm font-bold rounded-xl py-3
+                       transition-all duration-150 flex items-center justify-center gap-2"
+          >
+            {isMarking ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Memproses...
+              </>
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Mark as Ready / Served
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

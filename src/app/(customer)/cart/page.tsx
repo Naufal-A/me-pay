@@ -12,7 +12,7 @@ type PaymentMethod = "qris" | "kasir";
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, removeItem, clearCart, totalPrice, tableNumber } =
+  const { items, removeItem, totalPrice, tableNumber } =
     useCartStore();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("qris");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,42 +31,49 @@ export default function CartPage() {
     setIsSubmitting(true);
 
     try {
-      await addDoc(collection(db, "orders"), {
-        // Tambahkan nomor pesanan acak yang unik untuk UI kasir
-        orderNumber: `#ORD-${Math.floor(Date.now() / 1000)
-          .toString()
-          .slice(-4)}`,
+      // 1. Simpan ke Firestore
+     const docRef = await addDoc(collection(db, "orders"), {
+        orderNumber: `#ORD-${Math.floor(Date.now() / 1000).toString().slice(-4)}`,
         tableNumber: tableNumber ?? "Takeaway",
-        customerName: "Pelanggan", // Nama default, bisa dikembangkan nanti
-
-        // Pemisahan status yang jelas antara Dapur dan Kasir
         orderStatus: "pending",
-        paymentMethod: paymentMethod, // "qris" | "kasir"
-        paymentStatus: paymentMethod === "kasir" ? "unpaid" : "paid",
-
+        paymentMethod: paymentMethod,
+        paymentStatus: "unpaid", // ⬅️ semua metode mulai dari "unpaid"
         totalPrice: totalPrice(),
         createdAt: serverTimestamp(),
-        items: items.map((item) => ({
-          menuId: item.menuId,
-          name: item.name,
-          image: item.image,
-          description: item.description,
-          price: item.price,
-          quantity: item.quantity,
-          note: item.note,
-        })),
+        items: items.map((item) => ({ ...item })),
       });
 
-      clearCart();
-      // ✅ Set cookie sebagai "tiket masuk" ke halaman order-success
-      // Max-age 30 detik — cukup untuk redirect, tidak bisa disimpan lama
-      document.cookie =
-        "order_success=true; path=/; max-age=30; SameSite=Strict";
+      if (paymentMethod === "qris") {
+        const res = await fetch('/api/qris', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transaction_id: docRef.id,
+            amount: totalPrice(),
+          })
+        });
 
-      router.push("/order-success"); // Pastikan halaman ini sudah ada atau buat placeholder-nya
+        const data = await res.json();
+
+        if (data && data.status === "success" && data.data && data.data.qris_content) {
+            sessionStorage.setItem("qris_content", data.data.qris_content);
+            sessionStorage.setItem("qris_invoiceid", data.data.qris_invoiceid);
+            sessionStorage.setItem("qris_requestdate", data.data.qris_request_date);
+            sessionStorage.setItem("qris_amount", totalPrice().toString());
+            sessionStorage.setItem("qris_docid", docRef.id); // ⬅️ baru, buat update status nanti
+            router.push("/payment-qris");
+        } else {
+            console.error("Data tidak sesuai:", data);
+            throw new Error("Gagal mendapatkan QRIS");
+        }
+      } else {
+        // Kasir
+        sessionStorage.setItem("order_docid", docRef.id);
+        router.push("/payment-cash");
+      }
     } catch (error) {
-      console.error("Gagal membuat pesanan:", error);
-      alert("Gagal mengirim pesanan. Coba lagi.");
+      console.error("Gagal:", error);
+      alert("Gagal memproses pesanan.");
     } finally {
       setIsSubmitting(false);
     }
